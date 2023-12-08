@@ -1,5 +1,14 @@
 package student.examples.uservice.api.client.rest;
 
+//import com.example.grpc.AuthServiceGrpc;
+//import com.example.grpc.AuthServiceOuterClass;
+//import com.example.grpc.AuthService;
+//import com.example.grpc.GreetingServiceGrpc;
+//import com.example.grpc.SignIpServiceGrpc;
+import com.example.grpc.AuthService;
+import com.example.grpc.SignIpServiceGrpc;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,9 +28,27 @@ import java.util.HashMap;
 public class AuthController {
 
     @PostMapping("/signup")
-    public RestResponse signup(@Valid @RequestBody UserSignupRequest userSignupRequest
-//            , BindingResult bindingResult
-    ){
+    public RestResponse signup(@Valid @RequestBody UserSignupRequest userSignupRequest){
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",9090)
+                .usePlaintext().build();
+
+        SignIpServiceGrpc.SignIpServiceBlockingStub stub =
+                SignIpServiceGrpc.newBlockingStub(channel);
+
+        AuthService.UserSignUpRequest request =
+                AuthService.UserSignUpRequest
+                        .newBuilder()
+                        .setUsername(userSignupRequest.getUsername())
+                        .setEmail(userSignupRequest.getEmail())
+                        .setPassword(userSignupRequest.getPassword())
+                        .build();
+
+        AuthService.UserSignUpResponse GRPCresponse = stub.signing(request);
+
+        System.out.println(GRPCresponse);
+
+        channel.shutdown();
 
         RestResponse response = new RestSuccessResponse(
             200,

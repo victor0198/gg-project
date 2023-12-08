@@ -1,0 +1,17 @@
+syntax = "proto3";
+package com.example.grpc;
+
+message UserSignUpRequest {
+  string email=1;
+  string username=2;
+  string password=3;
+}
+
+message UserSignUpResponse{
+  string status=1;
+  string uuid=2;
+}
+
+service SignIpService{
+  rpc signing(UserSignUpRequest) returns (UserSignUpResponse);
+}
