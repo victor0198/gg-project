@@ -6,15 +6,15 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 @Entity(name = "users")
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class User {
-
     @Id
     private UUID id;
 
@@ -26,6 +26,12 @@ public class User {
 
     @Column(nullable=false)
     private String password;
+
+    @Column(nullable=false)
+    private String token;
+
+    @Column(nullable=false)
+    private boolean active;
 
     @Override
     public String toString() {
