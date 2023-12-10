@@ -1,27 +1,29 @@
 syntax = "proto3";
 package com.example.grpc;
 
-message UserSignUpRequest {
+message UserManageRequest {
   string email=1;
   string username=2;
   string password=3;
 }
 
-message UserSignUpResponse{
+message UserManageResponse{
   string status=1;
   string uuid=2;
 }
 
-message ActivationRequest{
+message AccountChangeRequest{
   string token=1;
 }
 
-message ActivationResponse{
+message AccountChangeResponse{
   string status=1;
   string message=2;
 }
 
 service SignUpService{
-  rpc signup(UserSignUpRequest) returns (UserSignUpResponse);
-  rpc activate(ActivationRequest) returns (ActivationResponse);
+  rpc signup(UserManageRequest) returns (UserManageResponse);
+  rpc activate(AccountChangeRequest) returns (AccountChangeResponse);
+  rpc withdraw(UserManageRequest) returns (UserManageResponse);
+  rpc remove(AccountChangeRequest) returns (AccountChangeResponse);
 }

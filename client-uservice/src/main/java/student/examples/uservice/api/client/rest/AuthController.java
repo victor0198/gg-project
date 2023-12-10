@@ -24,15 +24,15 @@ public class AuthController {
         SignUpServiceGrpc.SignUpServiceBlockingStub stub =
                 SignUpServiceGrpc.newBlockingStub(channel);
 
-        AuthService.UserSignUpRequest request =
-                AuthService.UserSignUpRequest
+        AuthService.UserManageRequest request =
+                AuthService.UserManageRequest
                         .newBuilder()
                         .setUsername(userSignupRequest.getUsername())
                         .setEmail(userSignupRequest.getEmail())
                         .setPassword(userSignupRequest.getPassword())
                         .build();
 
-        AuthService.UserSignUpResponse GRPCresponse = stub.signup(request);
+        AuthService.UserManageResponse GRPCresponse = stub.signup(request);
 
         System.out.println(GRPCresponse);
 
@@ -68,13 +68,13 @@ public class AuthController {
         SignUpServiceGrpc.SignUpServiceBlockingStub stub =
                 SignUpServiceGrpc.newBlockingStub(channel);
 
-        AuthService.ActivationRequest request =
-                AuthService.ActivationRequest
+        AuthService.AccountChangeRequest request =
+                AuthService.AccountChangeRequest
                         .newBuilder()
                         .setToken(token)
                         .build();
 
-        AuthService.ActivationResponse GRPCresponse = stub.activate(request);
+        AuthService.AccountChangeResponse GRPCresponse = stub.activate(request);
 
         System.out.println(GRPCresponse);
 
@@ -102,6 +102,101 @@ public class AuthController {
                     put(
                             "messsage",
                             String.format("Account with token %s was activated",
+                                    finalToken
+                            )
+                    );
+                }}
+        );
+        return response;
+    }
+
+
+
+
+
+
+    @PostMapping("/withdrawal")
+    public student.examples.uservice.api.client.dto.RestResponse withdrawal(@Valid @RequestBody student.examples.uservice.api.client.dto.UserSignupRequest userSignupRequest){
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",9090)
+                .usePlaintext().build();
+
+        SignUpServiceGrpc.SignUpServiceBlockingStub stub =
+                SignUpServiceGrpc.newBlockingStub(channel);
+
+        AuthService.UserManageRequest request =
+                AuthService.UserManageRequest
+                        .newBuilder()
+                        .setEmail(userSignupRequest.getEmail())
+                        .setPassword(userSignupRequest.getPassword())
+                        .build();
+
+        AuthService.UserManageResponse GRPCresponse = stub.withdraw(request);
+
+        System.out.println(GRPCresponse);
+
+        channel.shutdown();
+
+        student.examples.uservice.api.client.dto.RestResponse response = new student.examples.uservice.api.client.dto.RestSuccessResponse(
+                200,
+                new HashMap<String, String>() {{
+                    put(
+                            "message",
+                            String.format("An email has been sent to %s, please confirm account removal",
+                                    userSignupRequest.getEmail()
+                            )
+                    );
+                }}
+        );
+        return response;
+    }
+
+
+    @GetMapping("/withdrawal/confirmation")
+    public student.examples.uservice.api.client.dto.RestResponse remove(@RequestParam(name = "token") String token) {
+        token = token.replace(' ', '+');
+        System.out.println("GOT token:" + token);
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",9090)
+                .usePlaintext().build();
+
+        SignUpServiceGrpc.SignUpServiceBlockingStub stub =
+                SignUpServiceGrpc.newBlockingStub(channel);
+
+        AuthService.AccountChangeRequest request =
+                AuthService.AccountChangeRequest
+                        .newBuilder()
+                        .setToken(token)
+                        .build();
+
+        AuthService.AccountChangeResponse GRPCresponse = stub.remove(request);
+
+        System.out.println(GRPCresponse);
+
+        channel.shutdown();
+
+        student.examples.uservice.api.client.dto.RestResponse response;
+
+        if(GRPCresponse.getMessage().equals("success")){
+            response = new student.examples.uservice.api.client.dto.RestSuccessResponse(
+                    200,
+                    new HashMap<String, String>() {{
+                        put(
+                                "message",
+                                "Account was not removed"
+                        );
+                    }}
+            );
+            return response;
+        }
+
+        String finalToken = token;
+        response = new student.examples.uservice.api.client.dto.RestSuccessResponse(
+                200,
+                new HashMap<String, String>() {{
+                    put(
+                            "messsage",
+                            String.format("Account with token %s was removed",
                                     finalToken
                             )
                     );

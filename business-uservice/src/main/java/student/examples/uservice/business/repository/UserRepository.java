@@ -8,13 +8,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import student.examples.uservice.business.domain.entity.User;
 
-import java.util.UUID;
-
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByToken(String token);
+
+    User findUserByEmailAndPassword(String email, String password);
+
     @Transactional
     @Modifying
     @Query("update users set active = :active where token = :token")
-    void updateActive(@Param(value = "token") String token, @Param(value = "active") boolean active);
+    void updateActive(@Param("token") String token, @Param("active") boolean active);
+
+    @Transactional
+    @Modifying
+    @Query("delete from users where token = :token")
+    void removeUser(@Param("token") String token);
 }

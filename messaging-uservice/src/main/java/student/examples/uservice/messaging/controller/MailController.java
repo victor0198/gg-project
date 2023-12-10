@@ -19,18 +19,34 @@ import java.util.Properties;
 @RestController
 @RequestMapping("/email")
 public class MailController {
-    @PostMapping("/send")
+    @PostMapping("/activate")
     public String signup(@RequestBody Email email) {
-        if (!sendEmail(email.getEmail(), email.getToken()))
+        if(email.getToken().isEmpty()){
+            return "FAIL";
+        }
+
+        String msg = "<div><h1>It's not a scam, click to play!</h1><a href=\"http://localhost:8444/auth/activation?token="+email.getToken()+"\"><h1>Start Game</h1></a>";
+
+        if (!sendEmail(email.getEmail(), msg))
+            return "FAIL";
+        return "OK";
+    }
+
+    @PostMapping("/withdraw")
+    public String withdraw(@RequestBody Email email) {
+        if(email.getToken().isEmpty()){
+            return "FAIL";
+        }
+
+        String msg = "<div><h1>Careful! You're deleting your account.</h1><a href=\"http://localhost:8444/auth/withdrawal/confirmation?token="+email.getToken()+"\"><h1>Confirm</h1></a>";
+
+        if (!sendEmail(email.getEmail(), msg))
             return "FAIL";
         return "OK";
     }
 
 
-    private boolean sendEmail(String email, String token) {
-        if(token.isEmpty()){
-            return false;
-        }
+    private boolean sendEmail(String email, String msg) {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.auth", true);
@@ -54,7 +70,7 @@ public class MailController {
                     InternetAddress.parse("victor0198@gmail.com"));// TODO: replace with email));
             message.setSubject("Mail Subject");
 
-            String msg = "<div><h1>It's not scam, click to play!</h1><a href=\"http://localhost:8444/auth/activation?token="+token+"\"><h1>Start Game</h1></a>";
+
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
@@ -64,7 +80,6 @@ public class MailController {
 
             message.setContent(multipart);
 
-            System.out.println("Trying to email with send token:" + token);
             Transport.send(message);
             System.out.println("Email sent");
             return true;

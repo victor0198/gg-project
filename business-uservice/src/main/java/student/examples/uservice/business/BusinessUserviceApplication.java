@@ -7,7 +7,7 @@ import java.io.IOException;
 
 @SpringBootApplication
 public class BusinessUserviceApplication {
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) {
 
 		SpringApplication.run(BusinessUserviceApplication.class, args);
 
