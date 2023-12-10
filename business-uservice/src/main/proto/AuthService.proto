@@ -12,6 +12,16 @@ message UserSignUpResponse{
   string uuid=2;
 }
 
-service SignIpService{
-  rpc signing(UserSignUpRequest) returns (UserSignUpResponse);
+message ActivationRequest{
+  string token=1;
+}
+
+message ActivationResponse{
+  string status=1;
+  string message=2;
+}
+
+service SignUpService{
+  rpc signup(UserSignUpRequest) returns (UserSignUpResponse);
+  rpc activate(ActivationRequest) returns (ActivationResponse);
 }
