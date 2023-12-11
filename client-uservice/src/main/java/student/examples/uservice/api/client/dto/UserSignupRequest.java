@@ -24,4 +24,13 @@ public class UserSignupRequest {
     @NotEmpty(message = "confirmation shouldn't be empty")
     private String passwordConfirmation;
 
+    @Override
+    public String toString() {
+        return "UserSignupRequest{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", passwordConfirmation='" + passwordConfirmation + '\'' +
+                '}';
+    }
 }
