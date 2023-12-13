@@ -7,6 +7,7 @@ import io.grpc.ManagedChannelBuilder;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import student.examples.uservice.api.client.dto.WithdrawRequest;
 
 import java.util.HashMap;
 
@@ -116,7 +117,7 @@ public class AuthController {
 
 
     @PostMapping("/withdrawal")
-    public student.examples.uservice.api.client.dto.RestResponse withdrawal(@Valid @RequestBody student.examples.uservice.api.client.dto.UserSignupRequest userSignupRequest){
+    public student.examples.uservice.api.client.dto.RestResponse withdrawal(@Valid @RequestBody WithdrawRequest withdrawRequest){
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",9090)
                 .usePlaintext().build();
@@ -127,8 +128,8 @@ public class AuthController {
         AuthService.UserManageRequest request =
                 AuthService.UserManageRequest
                         .newBuilder()
-                        .setEmail(userSignupRequest.getEmail())
-                        .setPassword(userSignupRequest.getPassword())
+                        .setEmail(withdrawRequest.getEmail())
+                        .setPassword(withdrawRequest.getPassword())
                         .build();
 
         AuthService.UserManageResponse GRPCresponse = stub.withdraw(request);
@@ -143,7 +144,7 @@ public class AuthController {
                     put(
                             "message",
                             String.format("An email has been sent to %s, please confirm account removal",
-                                    userSignupRequest.getEmail()
+                                    withdrawRequest.getEmail()
                             )
                     );
                 }}
