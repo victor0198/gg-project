@@ -41,90 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class TestFieldValidation {
     private static ValidatorFactory validatorFactory;
     private static Validator validator;
-    @Test
-    void testContext() throws IllegalAccessException {
-
-        validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
-
-        UserSignupRequest userSignupRequest = new UserSignupRequest();
-
-        String validationResults="";
-        String file = GitHubFileReader.getCSV();
-        try (StringReader stringReader = new StringReader(file);
-             CSVReader csvReader = new CSVReader(stringReader)) {
-
-            String[] line;
-            while ((line = csvReader.readNext()) != null) {
-                Field usermaneField = UserSignupRequest.class.getDeclaredField("username");
-                Field emailField = UserSignupRequest.class.getDeclaredField("email");
-                Field passwordField = UserSignupRequest.class.getDeclaredField("password");
-                Field passwordConfirmationField = UserSignupRequest.class.getDeclaredField("passwordConfirmation");
-
-                usermaneField.setAccessible(true);
-                emailField.setAccessible(true);
-                passwordField.setAccessible(true);
-                passwordConfirmationField.setAccessible(true);
-
-                usermaneField.set(userSignupRequest, line[0]);
-                emailField.set(userSignupRequest, line[1]);
-                passwordField.set(userSignupRequest, line[2]);
-                passwordConfirmationField.set(userSignupRequest, line[3]);
-
-                System.out.println("Row: " + String.join("|", line));
-
-                Set<ConstraintViolation<UserSignupRequest>> violations = validator.validate(userSignupRequest);
-                validationResults = validationResults.concat("\n").concat(violations.toString());
-                System.out.println(violations);
-
-                System.out.println(violations.isEmpty());
-            }
-        } catch (IOException | CsvValidationException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        validatorFactory.close();
-    }
-
-    public class GitHubFileReader {
-
-        public static String getCSV() {
-            String owner = "victor0198";
-            String repo = "test-data";
-            String filePath = "UserSignUpValidation.txt";
-
-            String fileContent="";
-            try {
-                fileContent = fetchGitHubFileContent(owner, repo, filePath);
-                System.out.println("File Content:\n" + fileContent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return fileContent;
-        }
-
-        private static String fetchGitHubFileContent(String owner, String repo, String filePath) throws Exception {
-            String apiUrl = "https://raw.githubusercontent.com/" + owner + "/" + repo + "/main/" + filePath;
-
-            HttpClient httpClient = HttpClient.newHttpClient();
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(apiUrl))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                return response.body();
-            } else {
-                throw new RuntimeException("Failed to fetch file content. HTTP Status Code: " + response.statusCode());
-            }
-        }
-    }
-
 
     @Test
     void fieldsValid() throws Exception {
@@ -234,7 +150,7 @@ class TestFieldValidation {
         pushCommand.setRemote("origin").setRefSpecs(refSpec);
 
         UsernamePasswordCredentialsProvider credentialsProvider =
-                new UsernamePasswordCredentialsProvider("victor0198", "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");
+                new UsernamePasswordCredentialsProvider("victor0198", "***");
         pushCommand.setCredentialsProvider(credentialsProvider);
 
         pushCommand.call();
